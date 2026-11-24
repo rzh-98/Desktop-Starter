@@ -31,9 +31,9 @@ jobs:
     env:
       CSC_IDENTITY_AUTO_DISCOVERY: false
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
@@ -52,12 +52,16 @@ jobs:
         if: runner.os != 'Linux'
         run: node .github/scripts/smoke.mjs screenshot-${{ runner.os }}.png
 
+      - name: Install CJK fonts for screenshots
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends fonts-noto-cjk
+
       - name: Smoke test (launch packaged app)
         if: runner.os == 'Linux'
         run: xvfb-run --auto-servernum node .github/scripts/smoke.mjs screenshot-${{ runner.os }}.png
 
       - name: Upload installers
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: installers-${{ runner.os }}
           if-no-files-found: error
@@ -69,7 +73,7 @@ jobs:
 
       - name: Upload screenshot
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: screenshot-${{ runner.os }}
           if-no-files-found: ignore
@@ -83,13 +87,13 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           pattern: installers-*
           merge-multiple: true
           path: dist
 
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           files: dist/**/*
           generate_release_notes: true
