@@ -4,6 +4,7 @@
   <p><a href="README.md">English</a> · <b>简体中文</b></p>
   <p>为桌面工具类软件准备的起点：一套可延续的设计语言、基础组件和可拆卸的窗口布局。</p>
   <p>
+    <a href="https://github.com/rzh-98/Desktop-Starter/actions/workflows/build.yml"><img alt="Build" src="https://github.com/rzh-98/Desktop-Starter/actions/workflows/build.yml/badge.svg" /></a>
     <img alt="Electron" src="https://img.shields.io/badge/Electron-45-47848F?logo=electron&logoColor=white" />
     <img alt="React" src="https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white" />
     <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white" />
@@ -229,7 +230,24 @@ npm run dist   # 正式安装包：mac 为 dmg+zip，Windows 为 nsis，Linux �
 
 - **macOS**：`dist` 会使用钥匙串中的开发者证书签名。公开分发前，还需要按照 [electron-builder 文档](https://www.electron.build/code-signing-mac)配置公证。
 - **Windows**：在 Windows 上运行 `npm run dist:win`，即可生成 NSIS 安装包。没有代码签名证书时，用户会看到 SmartScreen 警告。
-- **跨平台**：建议分别在对应平台的机器或 CI runner 上构建。在 macOS 上，`npx electron-builder --win --dir` 可以生成未打包成安装程序的 Windows 应用，用于快速检查；但在 Apple Silicon 上生成 NSIS 安装包需要 Rosetta，或者改用 Windows 机器。
+- **跨平台**：建议分别在对应平台的机器或 CI runner 上构建（见下文）。在 macOS 上，`npx electron-builder --win --dir` 可以生成未打包成安装程序的 Windows 应用，用于快速检查；但在 Apple Silicon 上生成 NSIS 安装包需要 Rosetta，或者改用 Windows 机器。
+
+### 持续集成
+
+[`.github/workflows/build.yml`](.github/workflows/build.yml) 会在推送到 `main`、提交 Pull Request 时自动运行，也可以在 Actions 页手动触发。它在 Windows、macOS 和 Linux 上并行构建：
+
+1. 执行 `npm ci`、Prettier 检查（仅 Linux），然后类型检查、构建并打包。
+2. 冒烟测试（[`.github/scripts/smoke.mjs`](.github/scripts/smoke.mjs)）启动打包后的应用，确认界面正常加载并保存截图。
+3. 安装包和截图作为 artifact 上传，可在 Actions 页对应运行记录中下载。
+
+发布正式版本时，推送版本 tag 即可。工作流会把三个平台的安装包附加到 GitHub Release：
+
+```bash
+npm version patch          # 更新 package.json 并创建 tag，例如 v0.1.1
+git push --follow-tags
+```
+
+CI 产物未签名。公开仓库使用 GitHub 标准托管 runner 免费；私有仓库消耗账号每月的 Actions 额度。不需要 CI 时，删除 `.github` 文件夹即可。
 
 ## 常见问题
 

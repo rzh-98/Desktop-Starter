@@ -4,6 +4,7 @@
   <p><b>English</b> · <a href="README.zh-CN.md">简体中文</a></p>
   <p>A starting point for desktop tools: a design language you can keep building on, core components, and a window layout made of detachable parts.</p>
   <p>
+    <a href="https://github.com/rzh-98/Desktop-Starter/actions/workflows/build.yml"><img alt="Build" src="https://github.com/rzh-98/Desktop-Starter/actions/workflows/build.yml/badge.svg" /></a>
     <img alt="Electron" src="https://img.shields.io/badge/Electron-45-47848F?logo=electron&logoColor=white" />
     <img alt="React" src="https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white" />
     <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white" />
@@ -229,7 +230,24 @@ npm run dist   # installers: dmg+zip on macOS, nsis on Windows, AppImage on Linu
 
 - **macOS:** `dist` signs with the developer certificate in your keychain. Before distributing publicly, set up notarization as described in the [electron-builder docs](https://www.electron.build/code-signing-mac).
 - **Windows:** run `npm run dist:win` on Windows to get an NSIS installer. Without a code-signing certificate, users see a SmartScreen warning.
-- **Cross-platform:** build each platform on its own machine or CI runner. On macOS, `npx electron-builder --win --dir` can produce an unpacked Windows app for a quick check, but the NSIS installer needs Rosetta on Apple Silicon, or a Windows machine.
+- **Cross-platform:** build each platform on its own machine or CI runner (see below). On macOS, `npx electron-builder --win --dir` can produce an unpacked Windows app for a quick check, but the NSIS installer needs Rosetta on Apple Silicon, or a Windows machine.
+
+### Continuous integration
+
+[`.github/workflows/build.yml`](.github/workflows/build.yml) runs on every push to `main`, on pull requests, and on demand from the Actions tab. It builds on Windows, macOS and Linux in parallel:
+
+1. `npm ci`, the Prettier check (Linux only), then typecheck, build and package.
+2. A smoke test ([`.github/scripts/smoke.mjs`](.github/scripts/smoke.mjs)) launches the packaged app, checks that the UI mounts and saves a screenshot.
+3. Installers and screenshots are uploaded as workflow artifacts. Download them from the run page in the Actions tab.
+
+To publish a release, push a version tag. The workflow attaches the Windows, macOS and Linux installers to a GitHub Release:
+
+```bash
+npm version patch          # bumps package.json and creates the tag, e.g. v0.1.1
+git push --follow-tags
+```
+
+CI builds are unsigned. Standard GitHub-hosted runners are free for public repositories; private repositories use the account's monthly Actions quota. Not needed? Delete the `.github` folder.
 
 ## FAQ
 
