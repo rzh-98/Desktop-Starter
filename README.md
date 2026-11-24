@@ -166,6 +166,11 @@ The page is registered in the sidebar and router automatically and gets a ⌘1�
 rm -rf src/renderer/src/pages/projects src/renderer/src/pages/settings
 ```
 
+```powershell
+# Windows PowerShell
+Remove-Item -Recurse -Force src/renderer/src/pages/projects, src/renderer/src/pages/settings
+```
+
 The app still builds and starts, and shows a “no pages yet” prompt. The appearance follows the system, and the theme support in `appearance.ts` stays in place.
 
 ### 7. Remove the sidebar
@@ -202,6 +207,19 @@ See [Components](docs/components.md) for props, examples and keyboard behavior.
   3. Expose the method with `ipcRenderer.invoke` in `preload/index.ts`.
 - React, Radix and the icon library are bundled by Vite, so they belong in `devDependencies`. Only packages the main process `require`s at runtime go in `dependencies`.
 
+## Platform notes
+
+The same code runs on macOS, Windows and Linux. There are no platform-specific scripts, and the commands are identical on every system.
+
+| Platform        | Title bar and menu                                                                                                                                                                               | Shortcuts                |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------ |
+| macOS           | Integrated title bar (`hiddenInset`). The sidebar header and toolbar drag the window, and the traffic lights stay centered in the toolbar at every density                                       | `⌘`                      |
+| Windows / Linux | Native title bar that follows the light or dark theme. Electron's default File / Edit / View menu is hidden: Alt still shows it in development (DevTools, reload), and packaged builds remove it | `Ctrl`, shown as `Ctrl+` |
+
+- Shortcut handling and labels go through `isModKey` and `modKey` in `@/lib/platform`, so new pages adapt automatically.
+- `.gitattributes` keeps LF line endings, so `git clone` on Windows does not break the Prettier check.
+- For a Windows title bar that blends into the toolbar, look at Electron's `titleBarStyle: 'hidden'` with `titleBarOverlay`. The template keeps the native title bar, which is the safest default.
+
 ## Packaging and release
 
 ```bash
@@ -210,8 +228,8 @@ npm run dist   # installers: dmg+zip on macOS, nsis on Windows, AppImage on Linu
 ```
 
 - **macOS:** `dist` signs with the developer certificate in your keychain. Before distributing publicly, set up notarization as described in the [electron-builder docs](https://www.electron.build/code-signing-mac).
-- **Windows:** you need a code-signing certificate; otherwise users see a SmartScreen warning.
-- **Cross-platform:** build each platform on its own CI runner instead of cross-building on one machine.
+- **Windows:** run `npm run dist:win` on Windows to get an NSIS installer. Without a code-signing certificate, users see a SmartScreen warning.
+- **Cross-platform:** build each platform on its own machine or CI runner. On macOS, `npx electron-builder --win --dir` can produce an unpacked Windows app for a quick check, but the NSIS installer needs Rosetta on Apple Silicon, or a Windows machine.
 
 ## FAQ
 

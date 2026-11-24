@@ -166,6 +166,11 @@ export default definePage({
 rm -rf src/renderer/src/pages/projects src/renderer/src/pages/settings
 ```
 
+```powershell
+# Windows PowerShell
+Remove-Item -Recurse -Force src/renderer/src/pages/projects, src/renderer/src/pages/settings
+```
+
 删除后，应用仍能正常构建和启动，并显示“还没有页面”的引导。此时外观会跟随系统，`appearance.ts` 中的主题能力仍然保留。
 
 ### 7. 去掉侧栏
@@ -202,6 +207,19 @@ import { createStore } from '@/lib/store'
   3. 在 `preload/index.ts` 中用 `ipcRenderer.invoke` 暴露该方法。
 - React、Radix 和图标库都会被 Vite 打进产物，所以放在 `devDependencies`。只有主进程运行时需要 `require` 的包，才放入 `dependencies`。
 
+## 平台说明
+
+同一份代码可以在 macOS、Windows 和 Linux 上运行。仓库中没有平台专用脚本，各系统使用相同的命令。
+
+| 平台            | 标题栏与菜单                                                                                                                                     | 快捷键                 |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------- |
+| macOS           | 一体化标题栏（`hiddenInset`）。侧栏顶部和工具栏可以拖动窗口；在任意密度下，红绿灯按钮都会在工具栏中垂直居中                                      | `⌘`                    |
+| Windows / Linux | 系统原生标题栏，随浅色或深色主题切换。Electron 默认的 File / Edit / View 菜单已隐藏：开发时按 Alt 仍可调出（用于 DevTools 和刷新），打包后会移除 | `Ctrl`，显示为 `Ctrl+` |
+
+- 快捷键的判断和显示都通过 `@/lib/platform` 中的 `isModKey` 和 `modKey` 处理，新页面会自动适配。
+- `.gitattributes` 固定使用 LF 换行，因此在 Windows 上 `git clone` 后，Prettier 检查不会失败。
+- 如果希望 Windows 标题栏与工具栏融为一体，可以研究 Electron 的 `titleBarStyle: 'hidden'` 和 `titleBarOverlay`。模板默认保留原生标题栏，这是最稳妥的选择。
+
 ## 打包与发布
 
 ```bash
@@ -210,8 +228,8 @@ npm run dist   # 正式安装包：mac 为 dmg+zip，Windows 为 nsis，Linux �
 ```
 
 - **macOS**：`dist` 会使用钥匙串中的开发者证书签名。公开分发前，还需要按照 [electron-builder 文档](https://www.electron.build/code-signing-mac)配置公证。
-- **Windows**：需要代码签名证书，否则用户会看到 SmartScreen 警告。
-- **跨平台**：建议在 CI 中分别使用对应平台的 runner 构建，不建议在一台机器上交叉打包。
+- **Windows**：在 Windows 上运行 `npm run dist:win`，即可生成 NSIS 安装包。没有代码签名证书时，用户会看到 SmartScreen 警告。
+- **跨平台**：建议分别在对应平台的机器或 CI runner 上构建。在 macOS 上，`npx electron-builder --win --dir` 可以生成未打包成安装程序的 Windows 应用，用于快速检查；但在 Apple Silicon 上生成 NSIS 安装包需要 Rosetta，或者改用 Windows 机器。
 
 ## 常见问题
 

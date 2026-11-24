@@ -1,4 +1,4 @@
-import { BrowserWindow, nativeTheme, shell } from 'electron'
+import { app, BrowserWindow, nativeTheme, shell } from 'electron'
 import { join } from 'node:path'
 import icon from '../../resources/icon.png?asset'
 
@@ -32,7 +32,7 @@ export function createMainWindow(): BrowserWindow {
           titleBarStyle: 'hiddenInset' as const,
           trafficLightPosition: trafficLightPosition(DEFAULT_TITLE_BAR_HEIGHT)
         }
-      : {}),
+      : { autoHideMenuBar: true }),
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -43,6 +43,10 @@ export function createMainWindow(): BrowserWindow {
   })
 
   win.once('ready-to-show', () => win.show())
+
+  // Windows / Linux: Electron's default File/Edit/View menu doesn't belong in a tool UI.
+  // In development it stays reachable with Alt (DevTools, reload); packaged builds drop it.
+  if (!isMac && app.isPackaged) win.removeMenu()
 
   // Open external links in the user's browser instead of a new Electron window.
   win.webContents.setWindowOpenHandler(({ url }) => {
