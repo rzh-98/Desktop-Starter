@@ -49,6 +49,19 @@ Most templates give you a home screen that has to be torn down for the next prod
 
 ## Quick start
 
+**Choose your desktop runtime.** Both builds use the same React pages, components, design tokens and persistence code. Each installer contains **one** shell, not both. The two apps have distinct identifiers and separate local data.
+
+| Shell              | Develop after `npm ci` | Package               | Requirements                                                                                 |
+| ------------------ | ---------------------- | --------------------- | -------------------------------------------------------------------------------------------- |
+| Electron (default) | `npm run dev`          | `npm run dist`        | Node.js; no Rust required                                                                    |
+| Tauri 2            | `npm run tauri:dev`    | `npm run tauri:build` | Node.js, stable Rust and [platform prerequisites](https://v2.tauri.app/start/prerequisites/) |
+
+For Tauri, edit `src-tauri/tauri.conf.json` (identifier, product and window title); version comes from `package.json`. Regenerate native icons with `npx tauri icon resources/icon.png`. Packages land in `src-tauri/target/release/bundle/`. Windows uses WebView2, macOS uses WKWebView, and Linux needs WebKitGTK 4.1. The renderer shares one `DesktopApi`; expose new native features through each adapter rather than importing Electron or Tauri into pages.
+
+To keep just Electron, remove `src-tauri/`, the Tauri Vite config, renderer `tauri.ts`, `tauri:*`/`web:*` scripts, `@tauri-apps/*` dependencies and the Tauri CI job/release dependency. For Tauri only, remove `src/main/`, `src/preload/`, Electron configs, Electron scripts (including `postinstall`), `main`, Electron packages and the Electron CI job/release dependency; remove the old Node tsconfig reference. Keep `src/shared/` and the renderer. Run `npm install` after pruning dependencies.
+
+CI builds both shells. Compare installers and screenshots in Actions artifacts; job summaries show installer MiB and one idle process-tree RSS sample at 8 seconds. RSS can double-count shared pages and miss system-managed WebView processes; it is not a whole-system memory benchmark.
+
 **Requirements:** Node.js 22.12+ and npm 10+. Electron is downloaded automatically during the first install.
 
 ```bash

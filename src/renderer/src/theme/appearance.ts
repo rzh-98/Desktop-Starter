@@ -32,13 +32,14 @@ function apply(): void {
   const state = store.get()
   const root = document.documentElement
   root.dataset.platform = platform
+  root.toggleAttribute('data-inset', !!window.desktop?.insetTitleBar)
   root.dataset.theme = resolveTheme(state.theme)
   root.dataset.density = state.density
   if (state.accentHue === null) root.style.removeProperty('--user-hue')
   else root.style.setProperty('--user-hue', String(state.accentHue))
 
   const toolbarHeight = parseFloat(getComputedStyle(root).getPropertyValue('--spacing-toolbar'))
-  void window.desktop?.setTitleBarHeight(toolbarHeight)
+  void window.desktop?.setTitleBarHeight?.(toolbarHeight)
 }
 
 /** Call once before rendering to avoid a flash of the wrong theme. */

@@ -1,0 +1,10 @@
+{
+  "identifier": "main",
+  "description": "Expose only version lookup and window appearance to the local renderer.",
+  "windows": ["main"],
+  "permissions": [
+    "core:app:allow-tauri-version",
+    "core:window:allow-set-theme",
+    "core:window:allow-start-dragging"
+  ]
+}

@@ -133,8 +133,7 @@ export function SettingsPage() {
           {window.desktop && (
             <FormRow label="运行环境">
               <span className="selectable text-sm text-fg-muted tabular-nums">
-                Electron {window.desktop.versions.electron} · Chromium{' '}
-                {window.desktop.versions.chrome.split('.')[0]} · {window.desktop.platform}
+                {window.desktop.runtime} · {window.desktop.platform}
               </span>
             </FormRow>
           )}

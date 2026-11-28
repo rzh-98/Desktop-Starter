@@ -3,7 +3,7 @@
 
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 /* `mac:` applies only when running on macOS (e.g. for window drag regions). */
-@custom-variant mac (&:where([data-platform='darwin'], [data-platform='darwin'] *));
+@custom-variant mac (&:where([data-inset], [data-inset] *));
 
 /* Keyboard focus — used by every interactive component. */
 @utility focus-ring {

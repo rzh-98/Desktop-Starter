@@ -49,6 +49,19 @@
 
 ## 快速开始
 
+**选择桌面运行时。** 两个版本共用 React 页面、组件、设计 token 和存储逻辑，每个安装包只包含一种外壳。应用标识不同，可以并排安装；本地数据不会自动互通。
+
+| 外壳             | `npm ci` 后启动     | 打包                  | 环境要求                                                                           |
+| ---------------- | ------------------- | --------------------- | ---------------------------------------------------------------------------------- |
+| Electron（默认） | `npm run dev`       | `npm run dist`        | Node.js，不需要 Rust                                                               |
+| Tauri 2          | `npm run tauri:dev` | `npm run tauri:build` | Node.js、稳定版 Rust 和[各平台前置依赖](https://v2.tauri.app/start/prerequisites/) |
+
+Tauri 的应用标识、产品名和窗口标题在 `src-tauri/tauri.conf.json` 设置；版本沿用 `package.json`。用 `npx tauri icon resources/icon.png` 生成原生图标，安装包输出到 `src-tauri/target/release/bundle/`。Windows 使用 WebView2，macOS 使用 WKWebView，Linux 需要 WebKitGTK 4.1。新增原生能力时扩展共享的 `DesktopApi`，分别在两套适配层实现，不要在页面中导入外壳 API。
+
+只保留 Electron：删除 `src-tauri/`、Tauri 的 Vite 配置、渲染器 `tauri.ts`、`tauri:*`/`web:*` 命令、`@tauri-apps/*` 依赖和对应 CI 任务及发布依赖。只保留 Tauri：删除 `src/main/`、`src/preload/`、Electron 配置与依赖、Electron 命令（含 `postinstall`）、`main` 字段、对应 CI 任务及发布依赖，并去掉旧 Node tsconfig 引用。保留 `src/shared/` 和渲染器，调整依赖后运行 `npm install`。
+
+CI 为两种外壳分别打包。Actions 提供安装包和截图，任务摘要记录安装包 MiB 与启动 8 秒后的进程树 RSS。RSS 可能重复计入共享页，也可能遗漏系统托管的 WebView 进程，不代表整机内存开销。
+
 **环境要求**：Node.js 22.12+、npm 10+。首次安装时会自动下载 Electron。
 
 ```bash

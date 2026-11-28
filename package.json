@@ -6,6 +6,10 @@
   "main": "./out/main/index.js",
   "private": true,
   "scripts": {
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build",
+    "web:dev": "vite --config vite.tauri.config.mts",
+    "web:build": "tsc --noEmit -p tsconfig.web.json && vite build --config vite.tauri.config.mts",
     "dev": "electron-vite dev",
     "start": "electron-vite preview",
     "build": "npm run typecheck && electron-vite build",
@@ -20,6 +24,8 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.5",
+    "@tauri-apps/api": "^2.12.5",
+    "@tauri-apps/cli": "^2.12.6",
     "@types/node": "^26.6.6",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",

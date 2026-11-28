@@ -10,8 +10,9 @@ export type ThemeSource = 'system' | 'light' | 'dark'
 export interface DesktopApi {
   /** Node's `process.platform`: 'darwin' | 'win32' | 'linux' | ... */
   platform: string
-  versions: { electron: string; chrome: string; node: string }
+  runtime: string
+  insetTitleBar: boolean
   setThemeSource: (source: ThemeSource) => Promise<void>
   /** Keeps macOS traffic lights vertically centred in the toolbar. */
-  setTitleBarHeight: (height: number) => Promise<void>
+  setTitleBarHeight?: (height: number) => Promise<void>
 }
