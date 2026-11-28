@@ -21,6 +21,8 @@ extension = {'Darwin': 'dmg', 'Windows': 'exe', 'Linux': 'AppImage'}[system]
 installers = folder.glob(f'bundle/*/*.{extension}' if tauri else f'*/*.{extension}')
 installer, = installers
 args = [str(executable.resolve())]
+if tauri:
+    subprocess.run([*args, '--check-renderer'], check=True, timeout=60)
 if not tauri and system == 'Linux':
     args.append('--no-sandbox')
 with subprocess.Popen(args) as app:
